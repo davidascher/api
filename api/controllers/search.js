@@ -78,6 +78,7 @@ router.get('/', function (req, res) {
   let query = req.query.query
   let sortingMethod = req.query.sortingMethod
   let selectedCategory = req.query.selectedCategory
+  let sortBy
   if (! sortingMethod) {
     sortingMethod = 'chronological'
   }
@@ -94,10 +95,13 @@ router.get('/', function (req, res) {
       body = body.query('match', parts[0], parts[1])
     }
   }
+
   if (sortingMethod === 'chronological') {
-    body = body.sort('lastmodified', 'desc')
-  } else {
-    body = body.sort('id', 'asc') // Note this requires a non-analyzed field
+    body = body.sort('post_date', 'desc')
+    sortBy = 'post_date:desc'
+  } else if (sortingMethod === 'alphabetical') {
+    body = body.sort('title_en') // Note this requires a non-analyzed field
+    sortBy = 'title_en' // Note this requires a non-analyzed field
   }
   let bodyquery = body.size(30).build('v2')
   let includeCases = selectedCategory === 'All' || selectedCategory === 'Cases'
@@ -155,7 +159,8 @@ router.get('/', function (req, res) {
         es.search({
           index: 'pp',
           type: 'case',
-          match_all: {}
+          match_all: {},
+          sort: sortBy
         }).then(function (result) { 
           return {type: 'case', hits: result['hits']['hits']}
         })
@@ -166,7 +171,8 @@ router.get('/', function (req, res) {
         es.search({
           index: 'pp',
           type: 'organization',
-          match_all: {}
+          match_all: {},
+          sort: sortBy
         }).then(function (result) { 
           return {type: 'organization', hits: result['hits']['hits']}
         })
@@ -177,7 +183,8 @@ router.get('/', function (req, res) {
         es.search({
           index: 'pp',
           type: 'method',
-          match_all: {}
+          match_all: {},
+          sort: sortBy
         }).then(function (result) { 
           return {type: 'method', hits: result['hits']['hits']}
         })
