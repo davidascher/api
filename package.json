@@ -40,11 +40,15 @@
     "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-2": "^6.18.0"
+  },
   "scripts": {
+    "build": "babel lib -d dist --presets es2015,stage-2",
     "start": "./node_modules/.bin/babel-node server.js",
     "start-dev": "nave use 6 bash -c 'node-dev server.js'",
-    "postinstall": "./node_modules/apidoc/bin/apidoc -i api",
+    "postinstall": "./node_modules/apidoc/bin/apidoc -i lib/api",
     "deploy": "git push heroku",
     "test": "nave use 6 bash -c 'node test | tap-spec'"
   }
